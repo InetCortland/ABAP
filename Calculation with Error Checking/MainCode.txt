@@ -1,0 +1,37 @@
+*&---------------------------------------------------------------------*
+*& Report  ZL_01_CALCULATION
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT zl_01_calculation.
+
+PARAMETERS: operand1 TYPE i ,  operand2 type i , operator type c.
+DATA result TYPE i.
+DATA exception type REF TO ZCX_01_CALC_EXCEPTION.
+DATA exception_text type string.
+
+try.
+
+CALL FUNCTION 'Z_01_FM_CALCULATION'
+  EXPORTING
+    im_operand1       = operand1
+    im_operand2       = operand2
+    im_operator       = operator
+
+ IMPORTING
+   EX_RESULT         = result.
+          .
+write: operand1, ' ' , operator, ' ' , operand2, '=' , result.
+
+
+catch ZCX_01_CALC_EXCEPTION INTO exception.
+  exception_text = exception->get_text( ).
+    write: 'Exception occured: ' , exception_text.
+
+
+ catch CX_SY_ZERODIVIDE.
+   write: 'Do not divide by zero!'.
+endtry.

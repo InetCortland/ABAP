@@ -1,0 +1,43 @@
+FUNCTION Z_01_FM_CALCULATION.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     VALUE(IM_OPERAND1) TYPE  I
+*"     VALUE(IM_OPERAND2) TYPE  I
+*"     VALUE(IM_OPERATOR) TYPE  C
+*"  EXPORTING
+*"     VALUE(EX_RESULT) TYPE  I
+*"  RAISING
+*"      CX_SY_ZERODIVIDE
+*"      ZCX_01_CALC_EXCEPTION
+*"----------------------------------------------------------------------
+
+
+
+
+
+
+ case im_operator.
+    when '+'.
+      ex_result = im_operand1 + im_operand2.
+
+    when '-'.
+      ex_result = im_operand1 - im_operand2.
+
+    when '*'.
+      ex_result = im_operand1 * im_operand2.
+
+    when '/'.
+      ex_result = im_operand1 / im_operand2.
+
+    WHEN OTHERS.
+      RAISE EXCEPTION TYPE zcx_01_undef_operator EXPORTING operator = im_operator.
+
+ endcase.
+
+  IF ex_result > 1000.
+      RAISE exception type zcx_01_valuetohigh EXPORTING maxvalue = 1000.
+   ENDIF.
+
+
+ENDFUNCTION.

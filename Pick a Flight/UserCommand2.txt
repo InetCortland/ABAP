@@ -1,0 +1,59 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZL_01_DYNPRO_USER_COMMAND_200.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0200  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0200 INPUT.
+
+*Release shared lock
+CALL FUNCTION 'DEQUEUE_EZ_SPFLI'
+ EXPORTING
+   MODE_SPFLI       = 'S'
+   MANDT            = SY-MANDT
+   CARRID           = spfli-carrid
+   CONNID           = spfli-connid.
+
+
+  case ok_code.
+      WHEN 'SAVE'.
+        IF spfli <> wa_flight.
+* create exclusive lock
+
+          CALL FUNCTION 'ENQUEUE_EZ_SPFLI'
+           EXPORTING
+             MODE_SPFLI           = 'E'
+             MANDT                = SY-MANDT
+             CARRID           = spfli-carrid
+             CONNID           = spfli-connid
+             EXCEPTIONS
+               FOREIGN_LOCK   = 1
+               SYSTEM_FAILURE = 2
+               OTHERS         = 3.
+
+*      Modify Data Set
+          MODIFY spfli FROM spfli.
+
+
+*         release the lock
+
+               CALL FUNCTION 'DEQUEUE_EZ_SPFLI'
+                EXPORTING
+                  MODE_SPFLI       = 'E'
+                  MANDT            = SY-MANDT
+                  CARRID           = spfli-carrid
+                  CONNID           = spfli-connid.
+
+
+
+        ENDIF.
+      ENDCASE.
+
+    CLEAR ok_code.
+
+
+
+
+ENDMODULE.                 " USER_COMMAND_0200  INPUT

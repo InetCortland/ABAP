@@ -1,0 +1,40 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZL_01_DYNPRO_USER_COMMAND.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+
+CASE ok_code.
+  WHEN 'BACK'.
+    LEAVE PROGRAM.
+  WHEN 'SELECT'.
+
+    CALL FUNCTION 'ENQUEUE_EZ_SPFLI'
+    EXPORTING
+      MODE_SPFLI           = 'S'
+      MANDT                = SY-MANDT
+      CARRID               = spfli-carrid
+       CONNID               = spfli-connid
+     EXCEPTIONS
+       FOREIGN_LOCK         = 1
+       SYSTEM_FAILURE       = 2
+       OTHERS               = 3
+              .
+    IF sy-subrc <> 0.
+* Implement suitable error handling here
+    ENDIF.
+
+    SELECT SINGLE * FROM spfli INTO wa_flight WHERE carrid = spfli-carrid AND connid = spfli-connid.
+ENDCASE.
+
+      CLEAR ok_code.
+
+
+
+
+
+ENDMODULE.                 " USER_COMMAND_0100  INPUT
